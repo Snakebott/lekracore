@@ -41,7 +41,9 @@ const methods = {
     },
 
     doclist: (args, opt, callback)=>{
-        _dbQuery(args, opt, callback, r.table('docs').without(['docDescription', 'id']));
+        let docList = ['docID', 'docDescription', 'id', 'uploadDate', 'uploader'];
+        logger.info(`incoming query id: ${JSON.stringify(args)}`);
+        _dbQuery(args, opt, callback, r.table('docs').without(docList));
     },
 
     doc: function(args, opt, callback){
@@ -51,6 +53,7 @@ const methods = {
                 callback(new Error(`invalid parameters or docID is not number`));
             }
             else{
+                logger.info(`incoming query id: ${opt}`);
                 _dbQuery(args, opt, callback, r.table('docs').filter({docID: args.docID}));
             }
         }
@@ -58,6 +61,12 @@ const methods = {
             logger.debug(`invalid parameter: ${JSON.stringify(args)}`);
             callback(new Error(`invalid parameters`));
         }
+    },
+
+    docs: function(args, opt, callback){
+        let docList  = ['docDescription', 'uploader'];
+        logger.info(`incoming query id: ${JSON.stringify(args)}`);
+        _dbQuery(args, opt, callback, r.table('docs').without(['docDescription', 'uploader']));
     },
 
     images: function(args, opt, callback){

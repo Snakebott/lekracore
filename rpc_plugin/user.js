@@ -47,15 +47,47 @@ const methods = {
     doc: function(args, opt, callback){
         try{
             if(typeof(args.docID) !== 'number'){
-                logger.debug(`invalid parameter docID: ${args}`);
-                callback(new Error(`invalid parameters`));
+                logger.debug(`invalid parameter docID: ${JSON.stringify(args)}`);
+                callback(new Error(`invalid parameters or docID is not number`));
             }
             else{
                 _dbQuery(args, opt, callback, r.table('docs').filter({docID: args.docID}));
             }
         }
         catch(err){
-            logger.debug(`invalid parameter: ${args}`);
+            logger.debug(`invalid parameter: ${JSON.stringify(args)}`);
+            callback(new Error(`invalid parameters`));
+        }
+    },
+
+    images: function(args, opt, callback){
+        try{
+            if(typeof(args.docID) !== 'number'){
+                logger.debug(`invalid parameter docID: ${JSON.stringify(args)}`);
+                callback(new Error(`invalid parameters or docID is not number`));
+            }
+            else{
+                _dbQuery(args, opt, callback, r.table('images').filter({docID: args.docID}));
+            }
+        }
+        catch(err){
+            logger.debug(`invalid parameters ${JSON.stringify(args)}`);
+            callback(new Error(`invalid parameters`));
+        }
+    },
+
+    imageinfo: function(args, opt, callback){
+        try{
+            if(typeof(args.imageID) !== 'number'){
+                logger.debug(`invalid parameter imageID: ${JSON.stringify(args)}`);
+                callback(new Error(`invalid parameter or imageID is not number`));
+            }
+            else{
+                _dbQuery(args, opt, callback, r.db('lekra').table('images').filter({imageID: args.imageID}).without('image'));
+            }
+        }
+        catch(err){
+            logger.debug(`invalid parameters: ${args}`);
             callback(new Error(`invalid parameters`));
         }
     }

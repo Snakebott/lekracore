@@ -1,0 +1,41 @@
+{
+    "webServer": {
+        "connection": {
+            "host": "0.0.0.0",
+            "port": 8881
+        },
+        "enabled": true,
+        "htmlDir": "./html"
+    },
+
+    "rpcServer": {
+        "connection": {
+            "host": "0.0.0.0",
+            "port": 8882
+        },
+        "enabled": true,
+        "pluginDir": "./rpc_plugin"
+    },
+
+    "logger": {
+        "appenders": [{
+            "type": "dateFile",
+            "filename": "logs/lekra2.log",
+            "pattern": "-yyyy-MM-dd",
+            "alwaysIncludePattern": false
+        }]
+    },
+    "level": "debug",
+    "libDir": "./lib",
+
+    "dbconfig": {
+        "connection": {
+            "host": "vm-node01.snakebot.net",
+            "port": 28016,
+            "user": "lekrapp",
+            "password": "P@$$wQr4",
+            "db": "lekra",
+            "timeout": 999999
+        }
+    }
+}

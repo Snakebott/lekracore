@@ -1,0 +1,30 @@
+{
+  "name": "lekracore",
+  "version": "1.0.0",
+  "description": "simple sirectory",
+  "main": "lekra.js",
+  "devDependencies": {
+    "json-rpc2": "^1.0.2",
+    "rethinkdb": "^2.3.3",
+    "snakelog": "^1.0.2",
+    "uuidv5": "^1.0.0"
+  },
+  "dependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Snakebott/lekracore.git"
+  },
+  "keywords": [
+    "directories",
+    "lekra"
+  ],
+  "author": "snakebot",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Snakebott/lekracore/issues"
+  },
+  "homepage": "https://github.com/Snakebott/lekracore#readme"
+}

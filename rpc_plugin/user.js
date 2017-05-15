@@ -1,39 +1,8 @@
+
 const r = require('rethinkdb');
 const logger = module.parent.exports.logger;
-
-function _dbQuery(args, opt, callback, reql){
-    r.connect(config.dbconfig.connection).then((conn)=>{
-        logger.debug(`database connection success`);
-        reql.run(conn).then((cursor)=>{
-            logger.debug(`Query to database ${config.dbconfig.connection.db} success`);    
-                
-            cursor.on('error', (err)=>{
-                logger.error(`database query error#3 ${err.message}`);
-                logger.debug(err);
-            });
-
-            cursor.toArray().then((rows)=>{
-                logger.debug(`get doclist success`);
-                callback(null, rows);
-            }, (err)=>{
-                logger.error(`database cursor error#4 ${err.message}`);
-                logger.debug(err);
-                callback(new Error(`internal server error#4`));
-            });
-
-            }, (err)=>{
-                logger.error(`database query error: ${err.message}`);
-                logger.debug(err);
-                callback(new Error(`internal server error#2`));
-            });
-
-        }, (err)=>{
-            logger.error(`Database connection error: ${err.message}`);
-            logger.debug(err);
-            callback(new Error(`Internal Server error#1`));
-        });
-    }
-
+var config;
+var db;
 const methods = {
 
     test: function(args, opt, callback){
@@ -43,7 +12,7 @@ const methods = {
     doclist: (args, opt, callback)=>{
         let docList = ['docID', 'docDescription', 'id', 'uploadDate', 'uploader'];
         logger.info(`incoming query id: ${JSON.stringify(args)}`);
-        _dbQuery(args, opt, callback, r.table('docs').without(docList));
+        db.query(r.table('docs').without(docList), args, opt, callback);
     },
 
     doc: function(args, opt, callback){
@@ -54,7 +23,7 @@ const methods = {
             }
             else{
                 logger.info(`incoming query id: ${opt}`);
-                _dbQuery(args, opt, callback, r.table('docs').filter({docID: args.docID}));
+                db.query(r.table('docs').filter({docID: args.docID}), args, opt, callback);
             }
         }
         catch(err){
@@ -66,7 +35,7 @@ const methods = {
     docs: function(args, opt, callback){
         let docList  = ['docDescription', 'uploader'];
         logger.info(`incoming query id: ${JSON.stringify(args)}`);
-        _dbQuery(args, opt, callback, r.table('docs').without(['docDescription', 'uploader']));
+        db.query(r.table('docs').without(['docDescription', 'uploader']), args, opt, callback);
     },
 
     images: function(args, opt, callback){
@@ -76,7 +45,7 @@ const methods = {
                 callback(new Error(`invalid parameters or docID is not number`));
             }
             else{
-                _dbQuery(args, opt, callback, r.table('images').filter({docID: args.docID}));
+                db.query( r.table('images').filter({docID: args.docID}), args, opt, callback);
             }
         }
         catch(err){
@@ -92,7 +61,7 @@ const methods = {
                 callback(new Error(`invalid parameter or imageID is not number`));
             }
             else{
-                _dbQuery(args, opt, callback, r.db('lekra').table('images').filter({imageID: args.imageID}).without('image'));
+                db.query(r.db('lekra').table('images').filter({imageID: args.imageID}).without('image'), args, opt, callback);
             }
         }
         catch(err){
@@ -104,7 +73,14 @@ const methods = {
 
 function user(conf){
     config = conf;
-    return methods;
+    try{
+        db = require(`../${config.libDir}/db`);
+        db.configure(config);
+        return methods;
+    }
+    catch(err){
+        logger.error(err.message);
+    }
 }
 
 module.exports = user;

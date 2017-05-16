@@ -71,7 +71,7 @@ const methods = {
     }
 }
 
-function user(conf){
+function docs(conf){
     config = conf;
     try{
         db = require(`../${config.libDir}/db`);
@@ -83,5 +83,5 @@ function user(conf){
     }
 }
 
-module.exports = user;
+module.exports = docs;
 

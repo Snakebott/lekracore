@@ -3,11 +3,13 @@
  */
 
 const fs = require('fs');
-const config = require('./config');
-const Snakelog = require('snakelog');
+const config = require('./~config');
+const log4js = require('log4js');
 const http = require('http');
 const rpc = require('json-rpc2');
+const r = require('rethinkdb');
 
+var dbconn = {open: false};
 
 function loadPlugin(files){
     if(files.length > 0){
@@ -24,6 +26,35 @@ function loadPlugin(files){
         });
         start();
     }
+}
+
+function databaseConnect(){
+    r.connect(config.dbconfig.connection, (err, conn)=>{
+        if(err){
+            logger.error(`could not connect to database: ${err.message}`);
+            logger.debug(err);
+            logger.info(`try to reconnect to database`);
+            setTimeout(databaseConnect, config.dbconfig.reconnectTimeout);
+        }
+        else{
+            logger.info('connected to database');
+            dbconn = conn;
+
+            dbconn.once('error', (err)=>{
+                logger.error(`database connection error: ${err.message}`);
+                logger.debug(err);
+                if(!dbconn.open){
+                    logger.info('try reconnect to database');
+                    setTimeout(databaseConnect, config.dbconfig.reconnectTimeout);
+                }
+            });
+
+            dbconn.once('close', ()=>{
+                logger.warn('database connection closed');
+                setTimeout(databaseConnect, config.dbconfig.reconnectTimeout);
+            });
+        }
+    });
 }
 
 function start(){
@@ -45,17 +76,24 @@ function start(){
         else{
             logger.info(`Webserver disabled`);
         }
-        if((config.rpcServer.enabled) || (config.webServer.enabled)) console.log(`==== Application Lekra started ====`);
+
+        databaseConnect();
+        setInterval(()=>{
+            logger.debug(`database connection status: ${dbconn.open}`);
+        }, config.dbconfig.reconnectTimeout);
+        
     }
     catch(err){
         logger.error(`Error starting server: ${err.message}`);
         logger.debug(err);
+        throw err;
     }
 }
 
 // init logger 
-var logger = new Snakelog(config.logger);
-logger.setLevel(config.level);
+log4js.configure(config.logger);
+var logger = log4js.getLogger(config.currentLogger);
+logger.setLevel(config.logger.categories.default.level);
 module.exports.logger = logger;
 
 //init webserver
@@ -82,3 +120,6 @@ fs.readdir(config.rpcServer.pluginDir, (err, files)=>{
     }
 });
 
+module.exports.getDBConnection = ()=>{
+    return dbconn;
+}

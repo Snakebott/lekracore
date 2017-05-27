@@ -1,22 +1,31 @@
 const r = require('rethinkdb');
 const logger = module.parent.exports.logger;
+const db = require('../lib/db');
+
+const className = 'dir';
 var config;
-var db;
+
 const methods = {
     name: function(args, opt, callback){
-        logger.info(`incoming request: ${JSON.stringify(args)}`);
-        db.query(r.table('settings').withFields(['name']), args, opt, callback);
+        let errcode = 1101;
+        let reql = r.table('settings').withFields(['name']);
+        logger.debug(`<${className}.name>: incoming request params: ${JSON.stringify(args)}`);
+        db.read(module.parent.exports.getDBConnection, reql, errcode, args, opt, callback);
     },
 
     headers: function(args, opt, callback){
-        logger.info(`incoming request: ${JSON.stringify(args)}`);
-        db.query(r.table('settings').withFields(['headers']), args, opt, callback);
+        let errcode = 1102;
+        let reql = r.table('settings').withFields(['headers']);
+        logger.info(`<${className}.headers>: incoming request: ${JSON.stringify(args)}`);
+        db.read(module.parent.exports.getDBConnection, reql, errcode, args, opt, callback);
     },
 
 
     description: function(args, opt, callback){
-        logger.info(`incoming request: ${JSON.stringify(args)}`);
-        db.query(r.table('settings').filter({description: {enable: true}}), args, opt, callback);
+        let errcode = 1103;
+        let reql = r.table('settings').withFields(['description']);
+        logger.info(`<${className}.description>: incoming request: ${JSON.stringify(args)}`);
+        db.read(module.parent.exports.getDBConnection, reql, errcode, args, opt, callback);
     }
 
 }
@@ -24,8 +33,7 @@ const methods = {
 function dir(conf){
     config = conf;
     try{
-        db = require(`../${config.libDir}/db`);
-        db.configure(config);
+
         return methods;
     }
     catch(err){

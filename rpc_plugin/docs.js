@@ -1,72 +1,74 @@
 
 const r = require('rethinkdb');
 const logger = module.parent.exports.logger;
+const db = require('../lib/db');
 var config;
-var db;
+
+const className = 'docs';
+
+//
 const methods = {
-
-    test: function(args, opt, callback){
-        callback(null, config);
-    },
-
+    //
     doclist: (args, opt, callback)=>{
-        let docList = ['docID', 'docDescription', 'id', 'uploadDate', 'uploader'];
-        logger.info(`incoming query id: ${JSON.stringify(args)}`);
-        db.query(r.table('docs').without(docList), args, opt, callback);
+        let errcode = 1001;
+        logger.info(`<${className}.doclist>: incoming request params: ${JSON.stringify(args)}`);
+        db.read(module.parent.exports.getDBConnection, r.table('docs').withFields(['docName']), errcode, args, opt, callback);
     },
 
     doc: function(args, opt, callback){
+        let errcode = 1002;
+        logger.info(`<${className}.doc>: incoming request params: ${JSON.stringify(args)}`);
         try{
             if(typeof(args.docID) !== 'number'){
-                logger.debug(`invalid parameter docID: ${JSON.stringify(args)}`);
-                callback(new Error(`invalid parameters or docID is not number`));
+                logger.warn(`<${className}.docs>: bad request incoming: ${JSON.stringify(args)}`);
+                callback(new Error(`Bad request: docID must be a number, example: {"docID": 100}`));
             }
             else{
-                logger.info(`incoming query id: ${opt}`);
-                db.query(r.table('docs').filter({docID: args.docID}), args, opt, callback);
+                db.read(module.parent.exports.getDBConnection, r.table('docs').filter({docID: args.docID}), errcode, args, opt, callback);
             }
         }
         catch(err){
-            logger.debug(`invalid parameter: ${JSON.stringify(args)}`);
-            callback(new Error(`invalid parameters`));
-        }
-    },
-
-    docs: function(args, opt, callback){
-        let docList  = ['docDescription', 'uploader'];
-        logger.info(`incoming query id: ${JSON.stringify(args)}`);
-        db.query(r.table('docs').without(['docDescription', 'uploader']), args, opt, callback);
+            logger.debug(err);
+            logger.warn(`<${className}.docs>: bad request incoming ${JSON.stringify(args)}`);
+            callback(new Error(`Bad request: docID must be a number, example: {"docID": 100}`));
+        };
     },
 
     images: function(args, opt, callback){
+        let errcode = 1004;
+        logger.info(`<${className}.images>: incoming request params: ${JSON.stringify(args)}`);
         try{
             if(typeof(args.docID) !== 'number'){
-                logger.debug(`invalid parameter docID: ${JSON.stringify(args)}`);
-                callback(new Error(`invalid parameters or docID is not number`));
+                logger.warn(`<${className}.images>: bad request incoming: ${JSON.stringify(args)}`);
+                callback(new Error(`Bad request: docID must be a number, example: {"docID": 100}`));
             }
             else{
-                db.query( r.table('images').filter({docID: args.docID}), args, opt, callback);
+                db.read(module.parent.exports.getDBConnection, r.table('images').filter({docID: args.docID}), errcode, args, opt, callback);
             }
         }
         catch(err){
-            logger.debug(`invalid parameters ${JSON.stringify(args)}`);
-            callback(new Error(`invalid parameters`));
+            logger.debug(err);
+            logger.warn(`<${className}.images>: bad request incoming ${JSON.stringify(args)}`);
+            callback(new Error(`Bad request: docID must be a number, example: {"docID": 100}`));
         }
     },
 
     imageinfo: function(args, opt, callback){
+        let errcode = 1005;
+        logger.info(`<${className}.imageinfo>: incoming request params: ${JSON.stringify(args)}`);
         try{
             if(typeof(args.imageID) !== 'number'){
-                logger.debug(`invalid parameter imageID: ${JSON.stringify(args)}`);
-                callback(new Error(`invalid parameter or imageID is not number`));
+                logger.warn(`<${className}.docs>: bad request incoming: ${JSON.stringify(args)}`);
+                callback(new Error(`Bad request: imageID must be a number, example: {"imageID": 100}`));
             }
             else{
-                db.query(r.db('lekra').table('images').filter({imageID: args.imageID}).without('image'), args, opt, callback);
+                db.read(module.parent.exports.getDBConnection, r.table('images').filter({imageID: args.imageID}).without(['image', 'id']), errcode, args, opt, callback);
             }
         }
         catch(err){
-            logger.debug(`invalid parameters: ${args}`);
-            callback(new Error(`invalid parameters`));
+            logger.debug(err);
+            logger.warn(`<${className}.images>: bad request incoming ${JSON.stringify(args)}`);
+            callback(new Error(`Bad request: imageID must be a number, example: {"imageID": 100}`));
         }
     }
 }
@@ -74,8 +76,7 @@ const methods = {
 function docs(conf){
     config = conf;
     try{
-        db = require(`../${config.libDir}/db`);
-        db.configure(config);
+
         return methods;
     }
     catch(err){

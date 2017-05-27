@@ -18,24 +18,27 @@
     },
 
     "logger": {
-        "appenders": [{
-            "type": "dateFile",
-            "filename": "logs/lekra2.log",
-            "pattern": "-yyyy-MM-dd",
-            "alwaysIncludePattern": false
-        }]
+        "appenders": [
+            {"type": "stdout", "category": "out"},
+            {"type": "dateFile", "filename": "./logs/bot.log", "pattern": "-yyyy-MM-dd", "category": "application"}
+        ],
+        "categories": {
+            "default": {"appenders": ["out", "application"], "level": "debug"}
+        }
     },
-    "level": "debug",
+
+    "currentLogger": "out",
     "libDir": "./lib",
 
     "dbconfig": {
         "connection": {
-            "host": "vm-node01.snakebot.net",
-            "port": 28016,
+            "host": "localhost",
+            "port": 28015,
             "user": "lekrapp",
             "password": "P@$$wQr4",
             "db": "lekra",
             "timeout": 999999
-        }
+        },
+        "reconnectTimeout": 15000
     }
 }

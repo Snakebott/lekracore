@@ -44,7 +44,38 @@
 
     "dbusers": {
         "id": "lekrapp",
-        "password": "password"
+        "password": "password",
+        "grant": {
+            "global": {
+                "connect": false
+            },
+            "local": {
+                "read": true,
+                "write": true
+            },
+            "tables": {
+                "access": {
+                    "read": true,
+                    "write": false
+                },
+                "settings": {
+                    "read": true,
+                    "write": true
+                },
+                "docs": {
+                    "read": true,
+                    "write": true
+                },
+                "images": {
+                    "read": true,
+                    "write": true
+                },
+                "users": {
+                    "read": true,
+                    "write": true
+                }
+            }
+        }
     },
 
     "grants": {

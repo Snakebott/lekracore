@@ -45,6 +45,17 @@ function insertData(dbconn, dbname, table, data){
     });
 }
 
+function tableGrant(dbconn, dbname, table, grant){
+    return new Promise((resolve, reject)=>{
+        r.db(dbname).table(table).grant(database.dbusers.id, grant).run(dbconn, (err, result)=>{
+            if(err) reject(err)
+            else{
+                resolve(table);
+            }
+        });
+    });
+}
+
 function usersCreate(dbconn, dbname){
     r.db('rethinkdb').table('users')
     .insert({id: database.dbusers.id, password: database.dbusers.password}).run(dbconn, (err, result)=>{
@@ -64,9 +75,28 @@ function usersCreate(dbconn, dbname){
             });
 
             Promise.all(dataPromises).then((result)=>{
-                clearInterval(timer);
-                console.log(`\n --== DATABASE CREATED (in ${time} sec) ==--`);
-                dbconn.close();
+                r.grant(database.dbusers.id, database.dbusers.grant.global).run(dbconn, (err, result)=>{
+                    if(err){
+                        console.error(`Error: ${err.message}`);
+                    }
+                    else{
+                        console.log(`[OK] \t Global grant success`);
+                        let tableGrantUsers = _.keys(database.dbusers.grant.tables).map((table, index)=>{
+                            return tableGrant(dbconn, dbname, table, database.dbusers.grant.tables[table]);
+                        });
+
+                        Promise.all(tableGrantUsers).then((result)=>{
+                            console.log(`[OK] \t table ${result} user granted`);
+                            clearInterval(timer);
+                            console.log(`\n --== database created ${time} sec left ==--\n`);
+                            dbconn.close();
+
+                        }).catch((err)=>{
+                            console.error(`[FA] \t user not granted: ${err.message}`);
+                        });
+                    }
+                });
+
             }).catch((err)=>{
                 console.log(`Error: ${err}`);
                 dbconn.close();

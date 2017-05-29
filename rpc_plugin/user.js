@@ -35,9 +35,19 @@ const methods = {
                     cursor.toArray().then((rows)=>{
                         logger.debug(`${className}: database query ok: ${JSON.stringify(rows)}`);
                         if(rows.length > 0){
-                            logger.info(`${className}: user ${email} login success`);
                             let token = uuid(new Date()).replace(/-/g, '') + uuid.v4().replace(/-/g, '');
-                            callback(null, {token: token});
+                            r.table('users')
+                            .filter({userinfo: {email: email}, password: md5(password)})
+                            .update({token: [{token: token, date: new Date().getTime()}]}).run(dbconn, (err, result)=>{
+                                if(err){
+                                    db.error(err, errcode, callback);
+                                }
+                                else{
+                                    logger.debug(`${className}: database write ok: ${JSON.stringify(rows)}`);
+                                    logger.info(`${className}: user ${email} login success`);
+                                    callback(null, {token: token});
+                                }
+                            });
                         }
                         else{
                             logger.warn(`${className}: user login failed ${email}`);

@@ -76,7 +76,7 @@ const methods = {
 function docs(conf){
     config = conf;
     try{
-
+        db.configure(conf);
         return methods;
     }
     catch(err){

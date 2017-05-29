@@ -33,7 +33,7 @@ const methods = {
 function dir(conf){
     config = conf;
     try{
-
+        db.configure(conf);
         return methods;
     }
     catch(err){

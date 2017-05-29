@@ -5,6 +5,7 @@
   "main": "lekra.js",
   "devDependencies": {
     "json-rpc2": "^1.0.2",
+    "md5": "^2.2.1",
     "rethinkdb": "^2.3.3",
     "snakelog": "^1.0.2",
     "uuid": "^3.0.1"

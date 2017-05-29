@@ -12,14 +12,42 @@ const className = '<user>';
 const methods = {
     login: function(args, opt, callback){
         let errcode = 1201;
-        let dbconn = module.parent.exports.getDbConnection;
-        if(typeof(args) !== 'object'){
+        let dbconn = module.parent.exports.getDBConnection();
+        
+        if(!dbconn.open){
+            logger.error(`${className}: database not opened`);
+            db.error(new Error('database closed'), errcode, callback);
+        }
+        else if(typeof(args) !== 'object'){
             logger.warn(`${className}: warning, invalid parameters ${JSON.stringify(args)}`);
         }
         else{
             let {email:email, password:password} = args;
             logger.debug(`${className}: incoming data ${JSON.stringify(args)}`);
-            db.read(dbconn, r.table('users'), errcode, args, opt, callback);
+            let reql = r.table('users')
+            .filter({userinfo: {email: email}, password: md5(password)})
+            .withFields(['id']);
+            reql.run(dbconn, (err, cursor)=>{
+                if(err){
+                    db.error(err, errcode, callback);
+                }
+                else{
+                    cursor.toArray().then((rows)=>{
+                        logger.debug(`${className}: database query ok: ${JSON.stringify(rows)}`);
+                        if(rows.length > 0){
+                            logger.info(`${className}: user ${email} login success`);
+                            let token = uuid(new Date()).replace(/-/g, '') + uuid.v4().replace(/-/g, '');
+                            callback(null, {token: token});
+                        }
+                        else{
+                            logger.warn(`${className}: user login failed ${email}`);
+                            callback(new Error('bad email or password'));
+                        }
+                    }, (err)=>{
+                        db.error(err, errcode, callback);
+                    });
+                }
+            });
         }
     },
 

@@ -10,6 +10,7 @@ var config;
 const className = '<user>';
 
 const methods = {
+    
     login: function(args, opt, callback){
         let errcode = 1201;
         let dbconn = module.parent.exports.getDBConnection();
@@ -59,10 +60,29 @@ const methods = {
                 }
             });
         }
+
+    },
+
+    logout: function(args, opt, callback){
+        let errcode = 1202;
+        callback(null, {msg: 'not yet ready'});
+
     },
 
     add: function(args, opt, callback){
         callback(new Error('not yet ready'));
+    },
+
+    delete: function(args, opt, callback){
+        callback(null, {msg: 'not yet ready'});
+    },
+
+    edit: function(args, opt, callback){
+        callback(null, {msg: 'not yet ready'});
+    },
+
+    grant: function(args, opt, callback){
+        callback(null, {msg: 'not yet ready'});
     }
 }
 

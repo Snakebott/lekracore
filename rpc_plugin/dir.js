@@ -26,6 +26,18 @@ const methods = {
         let reql = r.table('settings').withFields(['description']);
         logger.info(`<${className}.description>: incoming request: ${JSON.stringify(args)}`);
         db.read(module.parent.exports.getDBConnection, reql, errcode, args, opt, callback);
+    },
+
+    setname: function(args, opt, callback){
+        callback(null, {msg: 'not yet ready'});
+    },
+
+    setheaders: function(args, opt, callback){
+        callback(null, {msg: 'not yet ready'});
+    },
+
+    setdescription: function(args, opt, callback){
+        callback(null, {msg: 'not yet ready'});
     }
 
 }

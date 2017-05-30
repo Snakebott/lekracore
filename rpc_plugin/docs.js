@@ -9,7 +9,7 @@ const className = 'docs';
 //
 const methods = {
     //
-    doclist: (args, opt, callback)=>{
+    list: (args, opt, callback)=>{
         let errcode = 1001;
         logger.info(`<${className}.doclist>: incoming request params: ${JSON.stringify(args)}`);
         db.read(module.parent.exports.getDBConnection, r.table('docs').withFields(['docName']), errcode, args, opt, callback);
@@ -70,6 +70,26 @@ const methods = {
             logger.warn(`<${className}.images>: bad request incoming ${JSON.stringify(args)}`);
             callback(new Error(`Bad request: imageID must be a number, example: {"imageID": 100}`));
         }
+    },
+
+    add: function(args, opt, callback){
+        callback(null, {msg: 'not yet ready'});
+    },
+
+    delete: function(args, opt, callback){
+        callback(null, {msg: 'not yet ready'});
+    },
+
+    addimage: function(args, opt, callback){
+        callback(null, {msg: 'not yet ready'});
+    },
+
+    deleteimage: function(args, opt, callback){
+        callback(null, {msg: 'not yet ready'});
+    },
+
+    find: function(args, opt, callback){
+        callback(null, {msg: 'not yet ready'});
     }
 }
 

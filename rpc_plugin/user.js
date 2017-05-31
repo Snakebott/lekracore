@@ -7,7 +7,7 @@ const md5 = require('md5');
 const logger = module.parent.exports.logger;
 
 var config;
-const className = '<user>';
+const className = 'user';
 
 const methods = {
     
@@ -16,7 +16,7 @@ const methods = {
         let dbconn = module.parent.exports.getDBConnection();
         
         if(!dbconn.open){
-            logger.error(`${className}: database not opened`);
+            logger.error(`<${className}.login>: database not opened`);
             db.error(new Error('database closed'), errcode, callback);
         }
         else if(typeof(args) !== 'object'){
@@ -34,7 +34,7 @@ const methods = {
                 }
                 else{
                     cursor.toArray().then((rows)=>{
-                        logger.debug(`${className}: database query ok: ${JSON.stringify(rows)}`);
+                        logger.debug(`<${className}.login>: database query ok: ${JSON.stringify(rows)}`);
                         if(rows.length > 0){
                             let token = uuid(new Date()).replace(/-/g, '') + uuid.v4().replace(/-/g, '');
                             r.table('users')
@@ -44,14 +44,14 @@ const methods = {
                                     db.error(err, errcode, callback);
                                 }
                                 else{
-                                    logger.debug(`${className}: database write ok: ${JSON.stringify(rows)}`);
-                                    logger.info(`${className}: user ${email} login success`);
+                                    logger.debug(`<${className}.login>: database write ok: ${JSON.stringify(rows)}`);
+                                    logger.info(`<${className}.login>: user ${email} login success`);
                                     callback(null, {token: token});
                                 }
                             });
                         }
                         else{
-                            logger.warn(`${className}: user login failed ${email}`);
+                            logger.warn(`<${className}.login>: user login failed ${email}`);
                             callback(new Error('bad email or password'));
                         }
                     }, (err)=>{

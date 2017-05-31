@@ -20,7 +20,7 @@
     "logger": {
         "appenders": [
             {"type": "stdout", "category": "out"},
-            {"type": "dateFile", "filename": "./logs/bot.log", "pattern": "-yyyy-MM-dd", "category": "application"}
+            {"type": "dateFile", "filename": "./logs/lekra.log", "pattern": "-yyyy-MM-dd", "category": "application"}
         ],
         "categories": {
             "default": {"appenders": ["out", "application"], "level": "debug"}

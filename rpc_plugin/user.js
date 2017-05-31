@@ -69,6 +69,11 @@ const methods = {
 
     },
 
+    logout: function(args, opt, callback){
+        let errcode = 1202;
+        callback(null, {msg: 'not yet ready'});
+    },
+
     add: function(args, opt, callback){
         callback(new Error('not yet ready'));
     },

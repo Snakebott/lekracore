@@ -12,25 +12,26 @@ const methods = {
     list: (args, opt, callback)=>{
         let errcode = 1001;
         logger.info(`<${className}.list>: incoming request params: ${JSON.stringify(args)}`);
-        db.read(module.parent.exports.getDBConnection, r.table('docs').withFields(['docName']), errcode, args, opt, callback);
+        db.read(module.parent.exports.getDBConnection, r.table('docs').withFields(['doc_name']), errcode, args, opt, callback);
     },
 
     get: function(args, opt, callback){
         let errcode = 1002;
         logger.info(`<${className}.get>: incoming request params: ${JSON.stringify(args)}`);
         try{
-            if(typeof(args.docID) !== 'number'){
+            if(typeof(args.doc_id) !== 'number'){
                 logger.warn(`<${className}.get>: bad request incoming: ${JSON.stringify(args)}`);
-                callback(new Error(`Bad request: docID must be a number, example: {"docID": 100}`));
+                callback(new Error(`Bad request: doc_id must be a number, example: {"doc_id": 100}`));
             }
             else{
-                db.read(module.parent.exports.getDBConnection, r.table('docs').filter({docID: args.docID}), errcode, args, opt, callback);
+                db.read(module.parent.exports.getDBConnection, 
+                r.table('docs').filter({doc_id: args.doc_id}), errcode, args, opt, callback);
             }
         }
         catch(err){
             logger.debug(err);
             logger.warn(`<${className}.get>: bad request incoming ${JSON.stringify(args)}`);
-            callback(new Error(`Bad request: docID must be a number, example: {"docID": 100}`));
+            callback(new Error(`Bad request: doc_id must be a number, example: {"doc_id": 100}`));
         };
     },
 

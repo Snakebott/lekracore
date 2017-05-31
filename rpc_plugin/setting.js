@@ -2,7 +2,7 @@ const r = require('rethinkdb');
 const logger = module.parent.exports.logger;
 const db = require('../lib/db');
 
-const className = 'image';
+const className = 'setting';
 var config;
 
 const methods = {

@@ -60,6 +60,13 @@ const methods = {
                 }
             });
         }
+
+    },
+
+    logout: function(args, opt, callback){
+        let errcode = 1202;
+        callback(null, {msg: 'not yet ready'});
+
     },
 
     logout: function(args, opt, callback){

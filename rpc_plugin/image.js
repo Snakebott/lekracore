@@ -16,18 +16,19 @@ const methods = {
         let errcode = 1005;
         logger.info(`<${className}.info>: incoming request params: ${JSON.stringify(args)}`);
         try{
-            if(typeof(args.imageID) !== 'number'){
+            if(typeof(args.image_id) !== 'number'){
                 logger.warn(`<${className}.docs>: bad request incoming: ${JSON.stringify(args)}`);
-                callback(new Error(`Bad request: imageID must be a number, example: {"imageID": 100}`));
+                callback(new Error(`Bad request: image_id must be a number, example: {"image_id": 100}`));
             }
             else{
-                db.read(module.parent.exports.getDBConnection, r.table('images').filter({imageID: args.imageID}).without(['image', 'id']), errcode, args, opt, callback);
+                db.read(module.parent.exports.getDBConnection, 
+                r.table('images').filter({image_id: args.image_id}).without(['image', 'id']), errcode, args, opt, callback);
             }
         }
         catch(err){
             logger.debug(err);
             logger.warn(`<${className}.info>: bad request incoming ${JSON.stringify(args)}`);
-            callback(new Error(`Bad request: imageID must be a number, example: {"imageID": 100}`));
+            callback(new Error(`Bad request: image_id must be a number, example: {"image_id": 100}`));
         }
     },
 
@@ -35,20 +36,20 @@ const methods = {
         let errcode = 1004;
         logger.info(`<${className}.get>: incoming request params: ${JSON.stringify(args)}`);
         try{
-            if(typeof(args.docID) !== 'number'){
+            if(typeof(args.doc_id) !== 'number'){
                 logger.warn(`<${className}.get>: bad request incoming: ${JSON.stringify(args)}`);
-                callback(new Error(`Bad request: docID must be a number, example: {"docID": 100}`));
+                callback(new Error(`Bad request: doc_id must be a number, example: {"doc_id": 100}`));
             }
             else{
                 db.read(module.parent.exports.getDBConnection, 
-                r.table('images').filter({docID: args.docID}), 
+                r.table('images').filter({doc_id: args.doc_id}), 
                 errcode, args, opt, callback);
             }
         }
         catch(err){
             logger.debug(err);
             logger.warn(`<${className}.get>: bad request incoming ${JSON.stringify(args)}`);
-            callback(new Error(`Bad request: docID must be a number, example: {"docID": 100}`));
+            callback(new Error(`Bad request: doc_id must be a number, example: {"doc_id": 100}`));
         }
     }
 

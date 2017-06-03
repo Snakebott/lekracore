@@ -7,11 +7,8 @@ var config;
 const className = 'image';
 
 const methods = {
-    
-    get: function(args, opt, callback){
-        callback(null, {msg: 'not yet ready'});
-    },
 
+    //    
     info: function(args, opt, callback){
         let errcode = 1005;
         logger.info(`<${className}.info>: incoming request params: ${JSON.stringify(args)}`);

@@ -12,7 +12,7 @@ const methods = {
     list: (args, opt, callback)=>{
         let errcode = 1001;
         logger.info(`<${className}.list>: incoming request params: ${JSON.stringify(args)}`);
-        db.read(module.parent.exports.getDBConnection, r.table('docs').withFields(['doc_name']), errcode, args, opt, callback);
+        db.read(module.parent.exports.getDBConnection, r.table('docs').withFields(['doc_name', 'doc_id']), errcode, args, opt, callback);
     },
 
     get: function(args, opt, callback){

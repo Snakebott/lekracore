@@ -27,7 +27,7 @@ const methods = {
             logger.debug(`${className}: incoming data ${JSON.stringify(args)}`);
             let reql = r.table('users')
             .filter({userinfo: {email: email}, password: md5(password)})
-            .withFields(['id']);
+            .withFields(['id', 'token']);
             reql.run(dbconn, (err, cursor)=>{
                 if(err){
                     db.error(err, errcode, callback);
@@ -36,19 +36,23 @@ const methods = {
                     cursor.toArray().then((rows)=>{
                         logger.debug(`<${className}.login>: database query ok: ${JSON.stringify(rows)}`);
                         if(rows.length > 0){
-                            let token = uuid(new Date()).replace(/-/g, '') + uuid.v4().replace(/-/g, '');
-                            r.table('users')
-                            .filter({userinfo: {email: email}, password: md5(password)})
-                            .update({token: [{token: token, date: new Date().getTime()}]}).run(dbconn, (err, result)=>{
-                                if(err){
-                                    db.error(err, errcode, callback);
-                                }
-                                else{
-                                    logger.debug(`<${className}.login>: database write ok: ${JSON.stringify(rows)}`);
-                                    logger.info(`<${className}.login>: user ${email} login success`);
-                                    callback(null, {token: token});
-                                }
-                            });
+                            if(rows[0].token.token){
+                                logger.info(`<${className}>: user ${args.email} was logged in`);
+                                callback(null, rows[0].token.token);
+                            }
+                            else{
+                                let token = uuid(new Date()).replace(/-/g, '') + uuid.v4().replace(/-/g, '');
+                                r.table('users').filter({userinfo: {email: email}, password: md5(password)})
+                                .update({token: {token: token, date: new Date().getTime()}}).run(dbconn, (err, result)=>{
+                                    if(err){
+                                        db.error(err, errcode, callback);
+                                    }
+                                    else{
+                                        logger.info(`<${className}>: user ${args.email} was logged in`);
+                                        callback(null, {token: token});
+                                    }
+                                });
+                            }
                         }
                         else{
                             logger.warn(`<${className}.login>: user login failed ${email}`);
@@ -60,8 +64,10 @@ const methods = {
                 }
             });
         }
+
     },
 
+    //
     logout: function(args, opt, callback){
         let errcode = 1202;
         callback(null, {msg: 'not yet ready'});

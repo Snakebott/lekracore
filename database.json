@@ -17,6 +17,7 @@
         },
         
         "access": [
+            {"access_id": 100, "role": "owner"},
             {"access_id": 50, "role": "admin"},
             {"access_id": 30, "role": "moderator"},
             {"access_id": 20, "role": "user"},
@@ -27,14 +28,14 @@
             {
                 "user_id": 1,
                 "password": "0317daccde17b4626e62a79334c43e07",
-                "access_id": 50,
+                "access_id": 100,
                 "enable": true,
                 "userinfo": {
                     "email": "admin@localhost",
-                    "first_name": "admin",
+                    "first_name": "owner",
                     "second_name": ""
                 },
-                "token": {}
+                "token": null
             }
         ],
         

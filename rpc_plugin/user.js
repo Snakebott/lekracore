@@ -27,7 +27,7 @@ const methods = {
             logger.debug(`${className}: incoming data ${JSON.stringify(args)}`);
             let reql = r.table('users')
             .filter({userinfo: {email: email}, password: md5(password)})
-            .withFields(['id', 'token']);
+            .without(['access_id', 'enable', 'password', 'userinfo', 'user_id']);
             reql.run(dbconn, (err, cursor)=>{
                 if(err){
                     db.error(err, errcode, callback);
@@ -36,9 +36,9 @@ const methods = {
                     cursor.toArray().then((rows)=>{
                         logger.debug(`<${className}.login>: database query ok: ${JSON.stringify(rows)}`);
                         if(rows.length > 0){
-                            if(rows[0].token.token){
+                            if(rows[0].token !== null){
                                 logger.info(`<${className}>: user ${args.email} was logged in`);
-                                callback(null, rows[0].token.token);
+                                callback(null, {token: rows[0].token.token});
                             }
                             else{
                                 let token = uuid(new Date()).replace(/-/g, '') + uuid.v4().replace(/-/g, '');

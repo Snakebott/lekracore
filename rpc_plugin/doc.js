@@ -36,6 +36,7 @@ const methods = {
     },
 
     add: function(args, opt, callback){
+        let errcode = 1006
         callback(null, {msg: 'not yet ready'});
     },
 

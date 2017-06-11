@@ -160,6 +160,19 @@ const methods = {
         };
     },
 
+    images: function(args, opt, callback){
+        let errcode = 1004;
+        let {doc_id:doc_id} = args;
+        if(!doc_id){
+            logger.warn(`<${className}.images>: warn, invalid parameters ${JSON.stringify(args)}`);
+            callback(new Error('invalid parameters'));
+        }
+        else{
+            db.read(module.parent.exports.getDBConnection, 
+            r.table('images').filter({doc_id: doc_id}), errcode, args, opt, callback);
+        }
+    },
+
     find: function(args, opt, callback){
         callback(null, {msg: 'not yet ready'});
     }

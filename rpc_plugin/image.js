@@ -10,7 +10,7 @@ const methods = {
 
     //    
     info: function(args, opt, callback){
-        let errcode = 1005;
+        let errcode = 1301;
         logger.info(`<${className}.info>: incoming request params: ${JSON.stringify(args)}`);
         try{
             if(typeof(args.image_id) !== 'number'){
@@ -30,7 +30,7 @@ const methods = {
     },
 
     get: function(args, opt, callback){
-        let errcode = 1004;
+        let errcode = 1304;
         logger.info(`<${className}.get>: incoming request params: ${JSON.stringify(args)}`);
         try{
             if(typeof(args.doc_id) !== 'number'){
@@ -47,7 +47,7 @@ const methods = {
             logger.debug(err);
             logger.warn(`<${className}.get>: bad request incoming ${JSON.stringify(args)}`);
             callback(new Error(`Bad request: doc_id must be a number, example: {"doc_id": 100}`));
-        }
+        };
     }
 
 }

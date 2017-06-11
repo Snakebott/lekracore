@@ -107,7 +107,57 @@ const methods = {
     },
 
     delete: function(args, opt, callback){
-        callback(null, {msg: 'not yet ready'});
+        let errcode = 1009;
+        let {token:token, doc:doc} = args;
+        let dbconn = module.parent.exports.getDBConnection();
+        if(!token || !doc || !doc.doc_id){
+            logger.warn(`<${className}.delete>: invalid parameters ${JSON.stringify(args)}`);
+            callback(new Error('invalid parameters'));
+        }
+        else{
+            db.checkToken(module.parent.exports.getDBConnection, token).then((token)=>{
+                logger.info(`<${className}.delete>: get token success`);
+                if(token.length === 0){
+                    logger.warn(`<${className}.delete>: warn bad token`);
+                    callback(new Error('auth error'));
+                }
+                else{
+                    r.table('docs').filter({doc_id: doc.doc_id}).run(dbconn).then((cursor)=>{
+
+                        cursor.toArray().then((delDoc)=>{
+                            if(delDoc.length === 0){
+                                logger.warn(`<${className}.delete>: warn, document with id ${doc.doc_id} no found`);
+                                callback(new Error(`document with id ${doc.doc_id} not found`));
+                            }
+                            else if(token[0].access_id < delDoc[0].access_id){
+                                logger.warn(`<${className}.delete>: warn, permission denied operation access[${delDoc[0].doc_id}] 
+                                user access[${token[0].access_id}]`);
+                                callback(new Error('permission denied'));
+                            }
+                            else{
+                                r.table('docs').filter({doc_id: delDoc[0].doc_id}).delete().run(dbconn)
+                                .then((delResult)=>{
+                                    logger.info(`<${className}.delete>: document with doc_id ${doc.doc_id} was deleted`);
+                                    callback(null, {msg: 'document deleted', doc_id: delDoc[0].doc_id});
+                                }).catch((err)=>{
+                                    logger.error(`<${className}.delete>: databse error ${err.message}`);
+                                    db.error(err, errcode, callback);
+                                });
+                            }
+                        }).catch((err)=>{
+                            logger.error(`<${className}.delete>: database cursor error ${err.message}`);
+                            db.error(err, errcode, callback);
+                        });
+                    }).catch((err)=>{
+                        logger.error(`<${className}.delete>: database error ${err.message}`);
+                        db.error(err, errcode, callback);
+                    });
+                }
+            }).catch((err)=>{
+                logger.error(`<${className}.delete>: get token error`);
+                db.error(err, errcode, callback);
+            });
+        }
     },
 
     addimage: function(args, opt, callback){

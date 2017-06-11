@@ -43,9 +43,10 @@
         "images": null
     },
 
-    "indexes": [
-        {"docs": "doc_id"}
-    ],
+    "indexes": {
+        "docs": ["doc_id"],
+        "users": ["user_id"]
+    },
 
     "dbusers": {
         "id": "lekrapp",

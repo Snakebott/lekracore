@@ -157,15 +157,7 @@ const methods = {
                 logger.error(`<${className}.delete>: get token error`);
                 db.error(err, errcode, callback);
             });
-        }
-    },
-
-    addimage: function(args, opt, callback){
-        callback(null, {msg: 'not yet ready'});
-    },
-
-    deleteimage: function(args, opt, callback){
-        callback(null, {msg: 'not yet ready'});
+        };
     },
 
     find: function(args, opt, callback){

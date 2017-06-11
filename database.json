@@ -43,6 +43,10 @@
         "images": null
     },
 
+    "indexes": [
+        {"docs": "doc_id"}
+    ],
+
     "dbusers": {
         "id": "lekrapp",
         "password": "password",

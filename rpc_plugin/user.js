@@ -48,7 +48,7 @@ const methods = {
                                         db.error(err, errcode, callback);
                                     }
                                     else{
-                                        logger.info(`<${className}>: user ${args.email} was logged in`);
+                                        logger.info(`<${className}.login>: user ${args.email} was logged in`);
                                         callback(null, {token: token});
                                     }
                                 });

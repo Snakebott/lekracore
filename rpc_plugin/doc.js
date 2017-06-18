@@ -2,6 +2,7 @@
 const r = require('rethinkdb');
 const logger = module.parent.exports.logger;
 const db = require('../lib/db');
+const uuid = require('uuid');
 var config;
 
 const className = 'doc';
@@ -170,6 +171,88 @@ const methods = {
         else{
             db.read(module.parent.exports.getDBConnection, 
             r.table('images').filter({doc_id: doc_id}), errcode, args, opt, callback);
+        }
+    },
+
+    change: function(args, opt, callback){
+        let errcode = 1005;
+        let dbconn = module.parent.exports.getDBConnection();
+        let {token:token, doc:doc} = args;
+        doc.doc_id = (doc.doc_id == 0) ? "0" : doc.doc_id;
+        if(!token || !doc || !doc.doc_id){
+            logger.warn(`<${className}.change>: Invalid parameters ${JSON.stringify(args)}`);
+            callback(new Error('invalid parameters'));
+        }
+        else{
+            db.checkToken(module.parent.exports.getDBConnection, token).then((key)=>{
+                logger.info(`<${className}.change>: get token success`);
+                if(key.length === 0){
+                    logger.warn(`<${className}.change>: warn bad token`);
+                    callback(new Error(`auth error`));
+                }
+                else{
+                    r.table('docs').filter({doc_id: parseInt(doc.doc_id)}).run(dbconn).then((cursor)=>{
+                        
+                        cursor.toArray().then((resultDoc)=>{
+                            if(resultDoc.length === 0){
+                                logger.warn(`<${className}.change>: doc not found with doc_id ${doc.doc_id}`);
+                                callback(new Error('doc not found'));
+                            }
+                            else{
+                                logger.info(`<${className}.change>: chec do for name success`);
+                                if(key[0].access_id < resultDoc[0].access_id){
+                                    logger.info(`<${className}.change>: warn, permission denied`);
+                                    callback(new Error('permission denied'));
+                                }
+                                else{
+                                    logger.info(`<${className}.change>: permission access`);
+                                    r.table('docs').filter({name: doc.name}).run(dbconn).then((cursor)=>{
+                                        cursor.toArray().then((checkDoc)=>{
+                                            if(checkDoc.length > 0){
+                                                logger.warn(`<${className}.change>: warn, doc with name ${doc.name} already exists`);
+                                                callback(new Error(`doc with name ${doc.name} already exists`));
+                                            }
+                                            else{
+                                                logger.info(`<${className}.change>: try change doc`);
+                                                doc.name = doc.name.trim() || uuid.v4();
+                                                checkDoc.name = doc.name;
+                                                checkDoc.text = doc.text;
+                                                r.table('docs').filter({doc_id: parseInt(doc.doc_id)})
+                                                .update({
+                                                    name: doc.name,
+                                                    text: doc.text
+                                                }).run(dbconn).then((result)=>{
+                                                    logger.info(`<${className}.change>: change doc success ${JSON.stringify(result)}`);
+                                                    callback(null, {msg: 'doc was changed', doc_id: doc.doc_id});
+                                                }).catch((err)=>{
+                                                    logger.error(`<${className}.change>: change doc error ${err.message}`);
+                                                    db.error(err, errcode, callback);
+                                                });
+                                            }
+                                        }).catch((err)=>{
+                                            logger.error(`<${className}.change>: check name cursor error ${err.message}`);
+                                            db.error(err, errcode, callback);
+                                        });
+                                    }).catch((err)=>{
+                                        logger.error(`<${className}.change>: check name error ${err.message}`);
+                                        db.error(err, errcode, callback);
+                                    });
+                                }
+                            }
+                        }).catch((err)=>{
+                            logger.error(`<${className}.change>: error check doc name ${err.message}`);
+                            db.error(err, errcode, callback);
+                        });
+
+                    }).catch((err)=>{
+                        logger.error(`<${className}.change>: error check doc name ${err.message}`);
+                        db.error(err, errcode, callback);
+                    });
+                }
+            }).catch((err)=>{
+                logger.error(`<${className}.change>: error change doc ${err.message}`);
+                db.error(err, errcode, callback);
+            });
         }
     },
 

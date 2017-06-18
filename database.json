@@ -45,7 +45,8 @@
 
     "indexes": {
         "docs": ["doc_id"],
-        "users": ["user_id"]
+        "users": ["user_id"],
+        "images": ["image_id"]
     },
 
     "dbusers": {

@@ -48,6 +48,16 @@ const methods = {
             logger.warn(`<${className}.get>: bad request incoming ${JSON.stringify(args)}`);
             callback(new Error(`Bad request: doc_id must be a number, example: {"doc_id": 100}`));
         };
+    },
+
+    add: function(args, opt, callback){
+        let errcode = 1305;
+        callback(null, 'not yet ready');
+    },
+
+    delete: function(args, opt, callback){
+        let errcode = 1306;
+        callback(null, 'not yet ready');
     }
 
 }

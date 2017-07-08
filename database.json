@@ -64,29 +64,11 @@
                 "access": {
                     "read": true,
                     "write": false
-                },
-                "settings": {
-                    "read": true,
-                    "write": true
-                },
-                "docs": {
-                    "read": true,
-                    "write": true
-                },
-                "images": {
-                    "read": true,
-                    "write": true
-                },
-                "users": {
-                    "read": true,
-                    "write": true
                 }
             }
         }
-    },
-
-    "grants": {
-        "access": {"read": true, "write": false}
     }
+
+
 }
 

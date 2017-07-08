@@ -35,7 +35,7 @@
             "host": "localhost",
             "port": 28015,
             "user": "lekrapp",
-            "password": "P@$$wQr4",
+            "password": "P@$$wQrd",
             "db": "lekra",
             "timeout": 999999
         },

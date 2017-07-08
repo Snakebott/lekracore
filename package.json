@@ -1,16 +1,16 @@
 {
   "name": "lekracore",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "simple sirectory",
   "main": "lekra.js",
-  "devDependencies": {
+  "dependencies": {
+    "log4js": "^1.1.1",
     "json-rpc2": "^1.0.2",
     "md5": "^2.2.1",
     "rethinkdb": "^2.3.3",
-    "snakelog": "^1.0.2",
     "uuid": "^3.0.1"
   },
-  "dependencies": {},
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

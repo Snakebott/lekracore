@@ -17,31 +17,32 @@
         },
         
         "access": [
-            {"accessID": 50, "role": "admin"},
-            {"accessID": 30, "role": "moderator"},
-            {"accessID": 20, "role": "user"},
-            {"accessID": 0, "role": "banned"}
+            {"access_id": 100, "role": "owner"},
+            {"access_id": 50, "role": "admin"},
+            {"access_id": 30, "role": "moderator"},
+            {"access_id": 20, "role": "user"},
+            {"access_id": 0, "role": "banned"}
         ],
 
         "users": [
             {
-                "userID": 1,
+                "user_id": 1,
                 "password": "0317daccde17b4626e62a79334c43e07",
-                "accessID": 50,
+                "access_id": 100,
                 "enable": true,
                 "userinfo": {
                     "email": "admin@localhost",
-                    "first_name": "admin",
+                    "first_name": "owner",
                     "second_name": ""
                 },
-                "token":[]
+                "token": null
             }
         ],
         
         "docs": null,
         "images": null
     },
-
+  
     "dbusers": {
         "id": "lekrapp",
         "password": "password",
@@ -57,29 +58,11 @@
                 "access": {
                     "read": true,
                     "write": false
-                },
-                "settings": {
-                    "read": true,
-                    "write": true
-                },
-                "docs": {
-                    "read": true,
-                    "write": true
-                },
-                "images": {
-                    "read": true,
-                    "write": true
-                },
-                "users": {
-                    "read": true,
-                    "write": true
                 }
             }
         }
-    },
-
-    "grants": {
-        "access": {"read": true, "write": false}
     }
+
+
 }
 

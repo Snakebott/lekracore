@@ -1,0 +1,35 @@
+
+Database error 3x
+
+Error#31 - database connection error
+Error#32 - databse query error
+Error#33 - databse query error
+Error#34 - database cursor error
+Error#35 - database cursor to array error
+
+Method error 1xxx
+
+Class docs 10xx:
+    Error#1001 - list error
+    Error#1002 - get error
+    Error#1003 - docs error
+    Error#1004 - images error
+    Error#1005 - change error
+    Error#1006 - add error
+    Error#1009 - delete error
+
+Class image 13xx:
+    Error#1301 - info error
+    Error#1304 - get error
+    Error#1305 - add error
+
+Class setting 11xx:
+    Error#1101 - name error
+    Error#1102 - header error
+    Error#1103 - description error
+    Error#1104 - setname error
+
+Class user 12xx
+    Error#1201 - login Error
+    Error#1201 - logout Error   
+    

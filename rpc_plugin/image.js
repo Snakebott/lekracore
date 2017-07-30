@@ -51,8 +51,77 @@ const methods = {
     },
 
     add: function(args, opt, callback){
+        const dbconn = module.parent.exports.getDBConnection;
+
+        function insertNewImage(image, callback){
+            r.table('images').insert(image).run(dbconn())
+            .then((result)=>{
+                logger.info(`<${className}.add>: image was added`);
+                callback(null, {state: true, result: result});
+            })
+            .catch((err)=>{
+                logger.error(`<${className}.add>: Error ${err.message}`);
+                db.error(err, errcode, callback);
+            });
+        }
+
         let errcode = 1305;
-        callback(null, 'not yet ready');
+        let {token:token, image:image} = args;
+        if(!token || !image || !image.doc_id || !image.image || !image.image_info){
+            logger.warn(`<${className}.add>: Invalid parameters`);
+            logger.debug(`<${className}.add>: ${JSON.stringify(args)}`);
+            callback(new Error('Invalid parameters, see doc'));
+        }
+        else{
+            logger.info(`<${className}.add>: Incoming request for add image for doc ID ${image.doc_id}`);
+            db.checkToken(dbconn, token).
+            then((token)=>{
+                if(token.length === 0){
+                    logger.warn(`<${className}.add>: user auth error`);
+                    callback(new Error(`auth error`));
+                }
+                else{
+                    r.table('docs').filter({doc_id: image.doc_id})
+                    .run(dbconn())
+                    .then((cursor)=>{
+                        cursor.toArray()
+                        .then((result)=>{
+                            if(result.length === 0){
+                                logger.warn(`<${className}.add>: doc with ID ${image.doc_id} not found`);
+                                callback(null, `document with doc ID ${image.doc_id} not found`);
+                            }
+                            else{
+                                logger.info(`<${className}.add>: get doc ${image.doc_id} success`);
+                                if(token[0].access_id < result[0].access_id){
+                                    logger.warn(`<${className}.add>: warn, access denied fro add image`);
+                                    callback(new Error(`access denied for this document`));
+                                }
+                                else if(!image.image_info.file_name || !image.image_info.file_type || !image.image_info.file_size){
+                                    logger.warn(`<${className}.add>: bad format file`);
+                                    callback(new Error(`bad image file`));
+                                }
+                                else{
+                                    insertNewImage(image, callback);
+                                }
+                            }
+                        })
+                        .catch((err)=>{
+                            logger.error(`<${className}.add>: Error ${err.message}`);
+                            db.error(err, errcode, callback);
+                        });
+                    })
+                    .catch((err)=>{
+                        logger.error(`<${className}.add>: Error: ${err.message}`);
+                        db.error(err, errcode, callback);
+                    });
+                }
+            })
+            .catch((err)=>{
+                logger.error(`<${className}.add>: Error ${err.message}`);
+                db.error(err, errcode, callback);
+            });
+        }
+
     },
 
     delete: function(args, opt, callback){

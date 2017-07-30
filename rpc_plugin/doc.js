@@ -37,12 +37,25 @@ const methods = {
     },
 
     add: function(args, opt, callback){
+
+        function insertNewDoc(doc, callback){
+            r.table('docs').insert(doc).run(module.parent.exports.getDBConnection())
+            .then((result)=>{
+                logger.info(`<${className}.add>: doc ${doc.name} was added`);
+                callback(null, `doc ${doc.name} was added`);
+            })
+            .catch((err)=>{
+                logger.error(`<${className}.add>: Error: ${err.message}`);
+                db.error(err, errcode, callback);
+            });
+        }
+
         let errcode = 1006;
         let access = 30;
         let {token:token, doc:doc} = args;
         if(!token || !doc || !doc.name || !doc.text){
             logger.warn(`<${className}.add>: bad request incoming ${JSON.stringify(args)}`);
-            callback(new Error(`invalid parameters: errcode ${errcode}`));
+            callback(new Error(`invalid parameters, see doc`));
         }
         else{
             db.checkToken(module.parent.exports.getDBConnection, token).then((token)=>{
@@ -68,24 +81,33 @@ const methods = {
                                     callback(new Error(`document with name ${doc.name} exists`));
                                 }
                                 else{
-                                    r.table('docs').max({index: 'doc_id'}).run(module.parent.exports.getDBConnection()).then((lastDoc)=>{
-                                        let newDoc = {
-                                            access_id: token[0].access_id,
-                                            doc_id: lastDoc.doc_id + 1,
-                                            uploader: token[0].user_id,
-                                            name: doc.name,
-                                            text: doc.text,
-                                            upload_date: new Date().toISOString()
+                                    let newDoc = {
+                                        access_id: token[0].access_id,
+                                        doc_id: 1,
+                                        uploader: token[0].user_id,
+                                        name: doc.name,
+                                        text: doc.text,
+                                        upload_date: new Date().toISOString()
                                         }
-                                        r.table('docs').insert(newDoc).run(module.parent.exports.getDBConnection()).then((result)=>{
-                                            logger.info(`<${className}.add>: document ${doc.name} inserted with doc_id ${newDoc.doc_id}`);
-                                            callback(null, {msg: 'document was added', doc_id: newDoc.doc_id});
-                                        }).catch((err)=>{
-                                            logger.error(`<${className}.add>: database insert error ${err.message}`);
-                                            db.error(err, errcode, callback);
-                                        });
+                                    r.table('docs').count().run(module.parent.exports.getDBConnection())
+                                    .then((count)=>{
+                                        if(count > 0){
+                                            r.table('docs').max({index: 'doc_id'})
+                                            .run(module.parent.exports.getDBConnection())
+                                            .then((lastDoc)=>{
+                                                newDoc.doc_id = lastDoc.doc_id + 1;
+                                                insertNewDoc(newDoc, callback);
+                                            })
+                                            .catch((err)=>{
+                                                logger.error(`<${className}.add>: Error: ${err.message}`);
+                                                db.error(err, errcode, callback);
+                                            });
+                                        }
+                                        else{
+                                            insertNewDoc(newDoc, callback);
+                                        }
                                     }).catch((err)=>{
-                                        logger.error(`<${className}.add>: database error ${err.message}`);
+                                        logger.error(`<${className}.add>: Error: ${err.message}`);
                                         db.error(err, errcode, callback);
                                     });
                                 }

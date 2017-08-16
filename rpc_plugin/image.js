@@ -101,6 +101,7 @@ const methods = {
                                     callback(new Error(`bad image file`));
                                 }
                                 else{
+                                    image.access_id = token[0].access_id;
                                     insertNewImage(image, callback);
                                 }
                             }

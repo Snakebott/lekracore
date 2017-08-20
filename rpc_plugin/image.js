@@ -102,7 +102,29 @@ const methods = {
                                 }
                                 else{
                                     image.access_id = token[0].access_id;
-                                    insertNewImage(image, callback);
+                                    r.table('images').count().run(dbconn()).then((imgCount)=>{
+                                        if(imgCount === 0){
+                                            image.image_id = imgCount += 1;
+                                            insertNewImage(image, callback);
+                                        }
+                                        else{
+                                            r.table('images').max({index: 'image_id'}).run(dbconn())
+                                            .then((lastImage)=>{
+                                                image.image_id = lastImage.image_id + 1;
+                                                insertNewImage(image, callback);
+                                            })
+                                            .catch((err)=>{
+                                                logger.error(`<${className}.add>: ${err.message}`);
+                                                logger.debug(`<${className}.add>: ${err}`);
+                                                db.error(err, errcode, callback);
+                                            });
+                                        }
+                                    }).catch((err)=>{
+                                        logger.error(`<${className}.add>: ${err.message}`);
+                                        logger.debug(`<${className}.add>: ${err}`);
+                                        db.error(err, errcode, callback);
+                                    });
+                                    // insertNewImage(image, callback);
                                 }
                             }
                         })

@@ -22,6 +22,7 @@ Class image 13xx:
     Error#1301 - info error
     Error#1304 - get error
     Error#1305 - add error
+    Error#1306 - delete error
 
 Class setting 11xx:
     Error#1101 - name error

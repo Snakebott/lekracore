@@ -149,7 +149,65 @@ const methods = {
 
     delete: function(args, opt, callback){
         let errcode = 1306;
-        callback(null, 'not yet ready');
+        let dbconn = module.parent.exports.getDBConnection;
+        let {token:token, image_id:image_id} = args;
+        if(!image_id || !token){
+            logger.warn(`<${className}.delete>: Invalid parameters`);
+            logger.debug(`<${className}.delete>: ${JSON.stringify(args)}`);
+            callback(new Error('Invalid parameters, see doc'));
+        }
+        else{
+            logger.info(`<${className}.delete>: incoming request`);
+            logger.debug(`<${className}.delete>: ${JSON.stringify(args)}`);
+            db.checkToken(dbconn, token).then((tokens)=>{
+                logger.debug(`<${className}.delete>: request token success`);
+                logger.debug(`<${className}.delete>: ${JSON.stringify(tokens)}`);
+                if(tokens.length === 0){
+                    logger.warn(`<${className}.delete>: warn, auth error`);
+                    callback(new Error('auth error'));
+                }
+                else{
+                    r.table('images').filter({image_id: image_id}).run(dbconn()).then((cursor)=>{
+                        cursor.toArray().then((images)=>{
+                            if(images.length === 0){
+                                logger.warn(`<${className}.delete>: warn - image with id ${image_id} not found`);
+                                callback(new Error(`image with id ${image_id} not found`));
+                            }
+                            else{
+                                logger.info(`<${className}.delete>: found image with id ${image_id}`);
+                                if(tokens[0].access_id < images[0].access_id){
+                                    logger.warn(`<${className}.delete>: warn, access denied`);
+                                    callback(new Error('access denied'));
+                                }
+                                else{
+                                    r.table('images').filter({id: images[0].id}).delete().run(dbconn())
+                                    .then((result)=>{
+                                        logger.info(`<${className}.delete>: image with id: ${image_id} deleted`);
+                                        logger.debug(`<${className}.delete>: ${result}`);
+                                        callback(null, `deleted: ${JSON.stringify(result)}`);
+                                    }).catch((err)=>{
+                                        logger.error(`<${className}.delete>: ${err.message}`);
+                                        logger.debug(`<${className}.delete>: ${err}`);
+                                        db.error(err, errcode, callback);
+                                    });
+                                }
+                                // callback(null, `found image with id ${image_id}`);
+                            }
+                        }).catch((err)=>{
+                            logger.error(`<${className}.delete>: ${err.message}`);
+                            logger.debug(`<${className}.delete>: ${err}`);
+                            db.error(err, errcode, callback);
+                        });
+                    }).catch((err)=>{
+                        logger.error(`<${className}.delete>: ${err.message}`);
+                        logger.debug(`<${className}.delete>: ${JSON.stringify(err)}`);
+                    });
+                }
+            }).catch((err)=>{
+                logger.error(`<${className}.delete>: Error: ${err.message}`);
+                db.error(err, errcode, callback);
+            });
+        }
     }
 
 }

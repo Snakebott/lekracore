@@ -31,22 +31,29 @@ const methods = {
 
     get: function(args, opt, callback){
         let errcode = 1304;
+        let {image:image} = args;
+        let dbconn = module.parent.exports.getDBConnection;
         logger.info(`<${className}.get>: incoming request params: ${JSON.stringify(args)}`);
         try{
-            if(typeof(args.doc_id) !== 'number'){
-                logger.warn(`<${className}.get>: bad request incoming: ${JSON.stringify(args)}`);
-                callback(new Error(`Bad request: doc_id must be a number, example: {"doc_id": 100}`));
+            if(typeof(image.image_id) === 'object'){
+                logger.debug(`<${className}.get>: image parameters is array`);
+                db.read(dbconn, r.table('images').getAll(...image.image_id, {index: 'image_id'}), 
+                    errcode, args, opt, callback);
+            }
+            else if(typeof(image.image_id) === 'number'){
+                logger.debug(`<${className}.get>: image parameter is number`);
+                db.read(dbconn, r.table('images').filter({image_id: image.image_id}),
+                    errcode, args, opt, callback);
             }
             else{
-                db.read(module.parent.exports.getDBConnection, 
-                r.table('images').filter({doc_id: args.doc_id}), 
-                errcode, args, opt, callback);
+                logger.warn(`<${className}.get>: Warn: Invalid parameters`);
+                callback(new Error('invalid parameters, see doc'));
             }
         }
         catch(err){
             logger.debug(err);
             logger.warn(`<${className}.get>: bad request incoming ${JSON.stringify(args)}`);
-            callback(new Error(`Bad request: doc_id must be a number, example: {"doc_id": 100}`));
+            callback(new Error(`Bad request: doc_id must be a number, example: {"image_id": 100}`));
         };
     },
 
@@ -207,6 +214,27 @@ const methods = {
                 logger.error(`<${className}.delete>: Error: ${err.message}`);
                 db.error(err, errcode, callback);
             });
+        }
+    },
+
+    list: function(args, opt, callback){
+        let dbconn = module.parent.exports.getDBConnection;
+        let errcode = 1307;
+        let {doc:doc} = args;
+        try{
+            let doc_id = doc.doc_id;
+            if(typeof doc_id !== 'number'){
+                logger.warn(`<${className}.list>: Warn: doc_id must be a number`)
+                callback(new Error('doc_id must be a number'));
+            }
+            else{
+                db.read(dbconn, r.table('images').filter({doc_id: doc_id}), errcode, args, opt, callback);
+            }
+        }
+        catch(err){
+            logger.error(`<${className}.list>: Error: ${err.message}`);
+            logger.debug(`<${className}.list> ${JSON.stringify(err)}`);
+            callback(new Error(`Invalid request, see doc`));
         }
     }
 

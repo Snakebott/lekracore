@@ -23,6 +23,7 @@ Class image 13xx:
     Error#1304 - get error
     Error#1305 - add error
     Error#1306 - delete error
+    Error#1307 - list error
 
 Class setting 11xx:
     Error#1101 - name error

@@ -8,5 +8,5 @@ RUN cd /app/lekracore && npm install
 
 EXPOSE 8881 8882
 
-ENTRYPOINT [ "node" ]
-CMD [ "lekra.js" ]
+ENTRYPOINT [ "npm" , "run"]
+CMD [ "start" ]
